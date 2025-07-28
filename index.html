@@ -133,6 +133,15 @@
             background: var(--color-primary);
             color: var(--color-background);
         }
+
+        #ai-question-input, #ai-response {
+            background-color: var(--color-background);
+            color: var(--color-text);
+        }
+
+        #ai-chat-widget {
+            background-color: var(--color-surface);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -156,14 +165,38 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <div id="header-title" class="text-lg md:text-xl font-semibold text-white">
-                    Selecione um tema para começar
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="h-7 w-7 text-amber-400 mr-3 flex-shrink-0"><path d="M16 16.5l4-4L16.5 8"/><path d="M8 16.5l-4-4L7.5 8"/><path d="M12 2v20"/><path d="M3 7h18"/></svg>
+                    <div id="header-title" class="text-lg md:text-xl font-semibold text-white">
+                        Selecione um tema para começar
+                    </div>
                 </div>
                 <div></div> <!-- Spacer -->
             </header>
             <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
                 <!-- Content will be injected by JS -->
             </main>
+        </div>
+    </div>
+
+    <!-- Botão Flutuante da IA -->
+    <button id="ai-fab" class="fixed bottom-6 right-6 bg-primary text-background rounded-full h-16 w-16 flex items-center justify-center shadow-lg z-40 transform transition-transform hover:scale-110">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-8 w-8"><path d="M12 8V4H8"/><rect x="4" y="12" width="8" height="8" rx="2"/><path d="M20 12v4h-4"/><path d="m18.5 7.4-1-1.1c-.2-.2-.4-.3-.7-.3H14"/><path d="M18 12h-2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+    </button>
+
+    <!-- Widget de IA -->
+    <div id="ai-chat-widget" class="fixed bottom-24 right-6 w-96 bg-surface border border-border rounded-lg shadow-2xl p-4 z-50 transition-all duration-300 ease-in-out origin-bottom-right" style="transform: scale(0.95) translateY(10px); opacity: 0; pointer-events: none;">
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="text-lg font-bold text-primary">Pergunte à I.A.</h3>
+            <button id="ai-close-btn" class="text-text-muted hover:text-white text-2xl font-bold leading-none">&times;</button>
+        </div>
+        <p class="text-sm text-text-muted mb-4">Faça uma pergunta sobre o conteúdo.</p>
+        <div id="ai-response" class="mb-4 p-3 bg-background rounded-md h-40 overflow-y-auto text-sm text-text-muted border border-border">
+            Aguardando sua pergunta...
+        </div>
+        <div class="flex gap-2">
+            <input type="text" id="ai-question-input" class="flex-grow bg-background border border-border rounded-md px-3 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ex: O que é comodato?">
+            <button id="ai-ask-button" class="bg-primary text-background font-bold px-4 py-2 rounded-md hover:bg-amber-600 transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed">Perguntar</button>
         </div>
     </div>
 
@@ -581,7 +614,6 @@ const contractComparisonData = {
     prestacao_servicos: { name: 'Prestação de Serviços', Objeto: 'Atividade (Meio)', Natureza: 'Oneroso', Finalidade: 'Realização de serviço', Restituição: 'Não se aplica' }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
     const nav = document.getElementById('main-nav');
     const mainContent = document.getElementById('main-content');
     const headerTitle = document.getElementById('header-title');
@@ -836,7 +868,127 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     render();
-});
+
+    // --- Funcionalidade da I.A. ---
+    const aiFab = document.getElementById('ai-fab');
+    const aiChatWidget = document.getElementById('ai-chat-widget');
+    const aiCloseBtn = document.getElementById('ai-close-btn');
+    const aiQuestionInput = document.getElementById('ai-question-input');
+    const aiAskButton = document.getElementById('ai-ask-button');
+    const aiResponseDiv = document.getElementById('ai-response');
+    const apiKey = 'AIzaSyAXTwmDEPQV3pnubpbGtA3e9cdwbyeuTEk';
+
+    function getFullTextContext() {
+        let fullText = '';
+        for (const topicKey in apostilaData) {
+            const topic = apostilaData[topicKey];
+            fullText += `Tópico: ${topic.title}\n`;
+            if (topic.content && typeof topic.content === 'string') {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = topic.content;
+                fullText += (tempDiv.textContent || tempDiv.innerText || '').replace(/\s\s+/g, ' ').trim() + '\n\n';
+            }
+            if (topic.subtopics) {
+                for (const subTopicKey in topic.subtopics) {
+                    const subtopic = topic.subtopics[subTopicKey];
+                    fullText += `Subtópico: ${subtopic.title}\n`;
+                    if (subtopic.content && Array.isArray(subtopic.content)) {
+                        subtopic.content.forEach(item => {
+                            if (item.type !== 'diagrama' && item.type !== 'quiz') {
+                               fullText += `${item.title}: ${String(item.content).replace(/<[^>]*>/g, ' ')}\n`;
+                            }
+                        });
+                    }
+                    fullText += '\n';
+                }
+            }
+        }
+        return fullText.replace(/\s\s+/g, ' ').trim();
+    }
+
+    async function handleAiQuestion() {
+        const question = aiQuestionInput.value.trim();
+        if (!question) {
+            aiResponseDiv.textContent = 'Por favor, digite uma pergunta.';
+            return;
+        }
+
+        aiAskButton.disabled = true;
+        aiAskButton.textContent = 'Pensando...';
+        aiResponseDiv.innerHTML = '<p class="text-center">Processando sua pergunta...</p>';
+
+        try {
+            const fullContext = getFullTextContext();
+            const prompt = `Você é um assistente de direito especialista no conteúdo de um manual específico. Responda à pergunta do usuário baseando-se exclusivamente no contexto fornecido a seguir. Seja direto e conciso. Se a resposta não puder ser encontrada no texto, informe: "Desculpe, não encontrei essa informação no manual.".
+
+**Contexto do Manual:**
+---
+${fullContext}
+---
+
+**Pergunta do Usuário:** "${question}"
+
+**Sua Resposta:**`;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.2,
+                        topP: 0.9,
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Erro desconhecido na API');
+            }
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts) {
+                const aiText = data.candidates[0].content.parts[0].text;
+                aiResponseDiv.textContent = aiText;
+            } else {
+                throw new Error("A API não retornou uma resposta válida.");
+            }
+
+        } catch (error) {
+            console.error("Erro ao chamar a API do Gemini:", error);
+            let errorMessage = `Ocorreu um erro: ${error.message}. Verifique se a chave de API é válida e tem as permissões corretas.`;
+            if (window.location.protocol === 'file:') {
+                errorMessage += ' Dica: A API pode não funcionar corretamente ao abrir o arquivo diretamente no navegador (protocolo file://). Tente usar um servidor web local.'
+            }
+            aiResponseDiv.textContent = errorMessage;
+        } finally {
+            aiAskButton.disabled = false;
+            aiAskButton.textContent = 'Perguntar';
+        }
+    }
+
+    aiFab.addEventListener('click', () => {
+        aiChatWidget.style.transform = 'scale(1) translateY(0)';
+        aiChatWidget.style.opacity = '1';
+        aiChatWidget.style.pointerEvents = 'auto';
+    });
+
+    aiCloseBtn.addEventListener('click', () => {
+        aiChatWidget.style.transform = 'scale(0.95) translateY(10px)';
+        aiChatWidget.style.opacity = '0';
+        aiChatWidget.style.pointerEvents = 'none';
+    });
+
+    aiAskButton.addEventListener('click', handleAiQuestion);
+    aiQuestionInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            handleAiQuestion();
+        }
+    });
 </script>
 </body>
 </html>
