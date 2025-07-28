@@ -43,10 +43,15 @@
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
         }
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .card-content {
+            flex-grow: 1;
         }
         .tab-button {
             transition: all 0.2s ease-in-out;
@@ -213,7 +218,7 @@ const apostilaData = {
                 content: [
                     { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 579, CC: "O empréstimo <b>gratuito</b> de coisas <b>não fungíveis</b>". Perfaz-se com a entrega (tradição) do objeto. A obrigação é devolver exatamente a mesma coisa.' },
                     { type: 'explicacao', title: 'Explicação Simples', content: 'É o contrato da amizade. Você empresta sua furadeira para o vizinho. Ele usa e devolve a *sua* furadeira, não uma nova. É de graça.' },
-                    { type:- 'caso', title: 'Caso Concreto', content: 'Pedro cede um imóvel em comodato para sua sobrinha por 4 anos. Ela paga o condomínio e as contas de consumo. Isso não descaracteriza a gratuidade, pois são despesas de uso. Pedro só pode reaver o bem antes do prazo se provar necessidade imprevista e urgente (Art. 581, CC).' },
+                    { type: 'caso', title: 'Caso Concreto', content: 'Pedro cede um imóvel em comodato para sua sobrinha por 4 anos. Ela paga o condomínio e as contas de consumo. Isso não descaracteriza a gratuidade, pois são despesas de uso. Pedro só pode reaver o bem antes do prazo se provar necessidade imprevista e urgente (Art. 581, CC).' },
                     { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.316.895:</b> O pagamento de encargos inerentes ao uso da coisa (IPTU, condomínio) pelo comodatário não descaracteriza a gratuidade do comodato, pois não é uma contraprestação direta ao comodante.' },
                     { type: 'dicas', title: 'Dica de Memorização', content: '<b>COMODATO = CÔMODO.</b> Você dá uma conveniência a alguém, de graça. Se tiver preço, vira locação.' },
                     { type: 'quiz', title: 'Mini Quiz', questions: [
@@ -346,56 +351,164 @@ const apostilaData = {
     parceria: {
         title: "Parceria",
         category: "Associativos",
-        content: `
-            <div class="p-4">
-                <p class="text-gray-600">Este tema será abordado em breve. A parceria, especialmente a rural, se diferencia do arrendamento pela <b>partilha de riscos e resultados</b>, em vez de um aluguel fixo.</p>
-            </div>
-        `
+        subtopics: {
+            conceito: {
+                title: "Conceito e Diferenças",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'A parceria, especialmente a rural (Lei 4.504/64), é um contrato agrário onde o parceiro-outorgante cede o uso do imóvel e o parceiro-outorgado entra com o trabalho, e ambos <b>partilham os riscos e os resultados</b> da atividade (agrícola, pecuária, etc.).' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'É diferente do arrendamento (aluguel rural). No arrendamento, o risco é só do arrendatário, que paga um valor fixo. Na parceria, se a colheita for boa, ambos ganham mais; se for ruim, ambos perdem juntos. São "sócios" no risco.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.459.668:</b> O falecimento do parceiro-outorgante (dono da terra) não extingue o contrato de parceria rural. Os herdeiros assumem a posição contratual, garantindo a continuidade da atividade agrária.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>P</b>arceria = <b>P</b>artilha de <b>P</b>rejuízos e <b>P</b>roventos. <br><b>A</b>rrendamento = <b>A</b>luguel fixo.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'A característica essencial da parceria rural é:', a: 'b) A partilha dos riscos e resultados.' },
+                        { q: 'Se uma geada destruir a safra em um contrato de arrendamento, quem arca com o prejuízo do aluguel?', a: 'a) O arrendatário, que deve pagar o valor fixo mesmo assim.' }
+                    ]}
+                ]
+            }
+        }
     },
     mandato: {
         title: "Mandato",
         category: "Representação e Intervenção",
-        content: `
-            <div class="p-4">
-                <p class="text-gray-600">Este tema será abordado em breve. O mandato é o contrato de representação (instrumento: procuração), baseado na confiança, onde o mandatário age em nome do mandante.</p>
-            </div>
-        `
+        subtopics: {
+            conceito: {
+                title: "Conceito e Procuração",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 653, CC: Contrato pelo qual alguém (mandatário) recebe de outrem (mandante) poderes para, em seu nome, praticar atos ou administrar interesses. O instrumento do mandato é a <b>procuração</b>.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'É dar a alguém sua "voz" para agir por você. Você (mandante) dá uma procuração (o papel) para seu amigo (mandatário) resolver algo em seu nome. O que ele faz, dentro dos poderes, obriga você.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>M</b>andato = A <b>M</b>issão. <br><b>P</b>rocuração = O <b>P</b>apel.' }
+                ]
+            },
+            direitos_deveres: {
+                title: "Direitos e Deveres",
+                content: [
+                    { type: 'deveres', title: 'Deveres do Mandatário', content: 'Agir com diligência, prestar contas, não exceder os poderes e indenizar prejuízos que causar por culpa.' },
+                    { type: 'direitos', title: 'Deveres do Mandante', content: 'Pagar a remuneração (se oneroso), adiantar despesas, assumir as obrigações contraídas pelo mandatário e ressarcir perdas.' }
+                ]
+            },
+            extincao: {
+                title: "Renúncia e Revogação",
+                content: [
+                    { type: 'conceito', title: 'Formas de Extinção', content: '<b>Revogação:</b> Ato do <b>mandante</b> que retira os poderes. <br><b>Renúncia:</b> Ato do <b>mandatário</b> que abre mão dos poderes. Ambos podem ser feitos a qualquer tempo, como regra.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: 'Quem <b>R</b>evoga é quem <b>R</b>ecebeu o favor (mandante). Quem <b>R</b>enuncia é quem p<b>R</b>estou o favor (mandatário).' },
+                ]
+            },
+            causa_propria: {
+                title: "Procuração em Causa Própria",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 685, CC: É um mandato com aparência de venda. O mandatário age em seu próprio interesse. É <b>irrevogável</b>, não se extingue com a morte e dispensa prestação de contas.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.345.170:</b> A procuração em causa própria, por si só, <b>não transfere a propriedade</b>. Ela apenas dá ao mandatário o poder de transferi-la para si mesmo, sendo um instrumento para a transferência, não o ato final.' },
+                ]
+            },
+            quiz: {
+                title: "Mini Quiz",
+                questions: [
+                    { q: 'O instrumento que formaliza o contrato de mandato é a:', a: 'b) Procuração.' },
+                    { q: 'A procuração que é irrevogável e não se extingue com a morte é a:', a: 'c) Em causa própria.' }
+                ]
+            }
+        }
     },
     gestao_negocios: {
         title: "Gestão de Negócios",
         category: "Representação e Intervenção",
-        content: `
-            <div class="p-4">
-                <p class="text-gray-600">Este tema será abordado em breve. Diferente do mandato, a gestão de negócios é a intervenção <b>espontânea e sem autorização</b> em negócio alheio, para evitar um prejuízo.</p>
-            </div>
-        `
+        subtopics: {
+            conceito: {
+                title: "Conceito e Natureza",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 861, CC: Ocorre quando alguém (gestor), por vontade própria e <b>sem autorização</b>, assume a administração de negócio alheio, para evitar um prejuízo ao dono.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'Seu vizinho viaja e uma telha da casa dele quebra na chuva. Você, para evitar um dano maior, chama um telhadista. Você agiu como gestor de negócios: sem autorização, mas no interesse dele.' },
+                    { type: 'diferenca', title: 'vs. Mandato', content: 'A diferença é a autorização. No mandato, ela é prévia. Na gestão, ela é inexistente. Se o dono ratificar a gestão, ela se converte em mandato.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>Gestão = "Gerir sem Permissão".</b> A chave é a ausência de autorização.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'O que caracteriza a gestão de negócios?', a: 'c) A intervenção espontânea e sem autorização em negócio alheio.' },
+                        { q: 'Se o dono do negócio ratifica os atos do gestor, a relação passa a ser regida pelas regras do:', a: 'b) Mandato.' }
+                    ]}
+                ]
+            }
+        }
     },
     mutuo: {
         title: "Mútuo",
         category: "Empréstimo e Guarda",
-        content: `
-            <div class="p-4">
-                <p class="text-gray-600">Este tema será abordado em breve. O mútuo é o empréstimo de <b>coisas fungíveis</b> (ex: dinheiro), onde se devolve algo de mesma espécie, qualidade e quantidade. Transfere a propriedade.</p>
-            </div>
-        `
+        subtopics: {
+            conceito: {
+                title: "Conceito e Características",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 586, CC: É o empréstimo de <b>coisas fungíveis</b> (ex: dinheiro, grãos). O mutuário (quem recebe) se torna dono da coisa e se obriga a restituir outra de mesmo gênero, qualidade e quantidade.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'É o "empréstimo para consumo". Você pede uma xícara de açúcar, usa, e depois devolve outra xícara de açúcar, não a mesma que pegou. O empréstimo de dinheiro é o exemplo mais comum.' },
+                    { type: 'diferenca', title: 'vs. Comodato', content: 'No <b>Mútuo</b>, a coisa é fungível e a propriedade é transferida. No <b>Comodato</b>, a coisa é infungível e se devolve o mesmo bem.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>M</b>útuo = <b>M</b>esma espécie, <b>M</b>esma qualidade, <b>M</b>esma quantidade.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'João empresta R$ 1.000 a Pedro. Qual contrato foi celebrado?', a: 'b) Mútuo.' },
+                        { q: 'No mútuo, a propriedade da coisa emprestada é transferida ao:', a: 'b) Mutuário (quem recebe).' }
+                    ]}
+                ]
+            }
+        }
     },
     deposito: {
         title: "Depósito",
         category: "Empréstimo e Guarda",
-        content: `
-            <div class="p-4">
-                <p class="text-gray-600">Este tema será abordado em breve. O depósito é o contrato de guarda de <b>coisa móvel</b> (ex: estacionamento), com dever de restituir. A Súmula 130 do STJ e a Súmula Vinculante 25 são fundamentais aqui.</p>
-            </div>
-        `
+        subtopics: {
+            conceito: {
+                title: "Conceito e Espécies",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 627, CC: Contrato pelo qual o depositário recebe um <b>objeto móvel</b> para <b>guardar</b>, até que o depositante o reclame. A obrigação principal é a guarda, não o uso.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'Deixar o carro no estacionamento ou o casaco na chapelaria. O dever do estabelecimento é guardar e devolver o bem nas mesmas condições.' },
+                    { type: 'tipos', title: 'Espécies', content: '<b>Voluntário:</b> por livre escolha. <b>Necessário:</b> imposto por lei ou calamidade (incêndio, inundação). O depósito em hotéis é considerado necessário.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>Depósito = Dever de Devolver.</b> A finalidade é a guarda.' },
+                ]
+            },
+            jurisprudencia: {
+                title: "Jurisprudência Relevante",
+                content: [
+                    { type: 'jurisprudencia', title: 'Súmula 130 do STJ', content: '"A empresa responde, perante o cliente, pela reparação de dano ou furto de veículo ocorridos em seu estacionamento." Isso se aplica a shoppings, supermercados, etc., mesmo que o estacionamento seja gratuito.' },
+                    { type: 'jurisprudencia', title: 'Súmula Vinculante 25 do STF', content: '"É ilícita a prisão civil de depositário infiel, qualquer que seja a modalidade do depósito." A responsabilidade hoje é apenas patrimonial (indenização).' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Um shopping center pode ser responsabilizado pelo furto de um carro em seu estacionamento gratuito?', a: 'a) Sim, conforme a Súmula 130 do STJ.' },
+                        { q: 'Atualmente, o depositário que não devolve o bem pode ser preso civilmente?', a: 'b) Não, conforme a Súmula Vinculante 25 do STF.' }
+                    ]}
+                ]
+            }
+        }
     },
     responsabilidade_civil: {
         title: "Responsabilidade Civil",
         category: "Responsabilidade Civil",
-        content: `
-            <div class="p-4">
-                <p class="text-gray-600">Este tema central do Direito Civil, que trata do dever de reparar um dano, será detalhado em breve, abordando seus elementos (conduta, dano, nexo causal), as modalidades (subjetiva e objetiva) e a teoria do risco.</p>
-            </div>
-        `
+        subtopics: {
+            conceito: {
+                title: "Conceito e Fundamentos",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'É o dever de reparar um dano causado a outrem. Fundamenta-se no princípio de que ninguém deve lesar o próximo (*neminem laedere*). Fontes: Ato Ilícito (Art. 186 CC) e Abuso de Direito (Art. 187 CC).' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'A regra do "quebrou, pagou". Se sua ação ou omissão causa um prejuízo a alguém, você tem a obrigação de indenizar essa pessoa, para restaurar o equilíbrio que foi rompido.' }
+                ]
+            },
+            elementos: {
+                title: "Elementos Essenciais",
+                content: [
+                    { type: 'conceito', title: 'Os 4 Pilares', content: 'Para haver o dever de indenizar, em regra, são necessários 4 elementos: <br><b>1. Conduta:</b> Ação ou omissão humana. <br><b>2. Dano:</b> O prejuízo (patrimonial ou moral). <br><b>3. Nexo Causal:</b> A ligação entre a conduta e o dano. <br><b>4. Culpa:</b> Negligência, imprudência ou imperícia (para a responsabilidade subjetiva).' }
+                ]
+            },
+            subjetiva_objetiva: {
+                title: "Subjetiva vs. Objetiva",
+                content: [
+                    { type: 'diferenca', title: 'A Grande Divisão', content: '<b>Subjetiva (Regra):</b> Exige a comprovação da <b>culpa</b> do agente. É a regra geral do Art. 186 do CC. <br><b>Objetiva (Exceção):</b> <b>Independe de culpa</b>. Basta provar a conduta, o dano e o nexo causal. Ocorre nos casos previstos em lei ou quando a atividade do agente implica, por sua natureza, risco para os direitos de outrem (teoria do risco).' },
+                    { type: 'exemplo', title: 'Exemplos', content: '<b>Subjetiva:</b> Médico que comete erro por negligência. <br><b>Objetiva:</b> Empresa de transporte que responde por acidente com passageiro; Dono de animal que responde por dano causado pelo bicho.' },
+                ]
+            },
+            dano: {
+                title: "Dano Patrimonial e Moral",
+                content: [
+                    { type: 'conceito', title: 'Tipos de Dano', content: '<b>Patrimonial (ou Material):</b> Atinge o patrimônio. Divide-se em <b>danos emergentes</b> (o que se perdeu) e <b>lucros cessantes</b> (o que se deixou de ganhar). <br><b>Moral:</b> Atinge direitos da personalidade (honra, imagem, dignidade). A indenização busca compensar a dor e punir o ofensor.' },
+                    { type: 'jurisprudencia', title: 'Dano Moral <i>in re ipsa</i> (STJ)', content: 'É o dano moral presumido, que decorre do próprio fato. Exemplos: inscrição indevida em cadastro de inadimplentes (Súmula 385/STJ), perda de tempo útil, extravio de bagagem.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'A responsabilidade civil que independe da comprovação de culpa é a:', a: 'b) Objetiva.' },
+                        { q: 'O taxista que, por um acidente, fica com o carro parado na oficina por um mês, tem direito a indenização por:', a: 'c) Danos emergentes (conserto) e lucros cessantes (o que deixou de ganhar).' }
+                    ]}
+                ]
+            }
+        }
     },
     comparador: {
         title: "Comparador de Contratos",
@@ -418,7 +531,9 @@ const contractComparisonData = {
     comodato: { name: 'Comodato', Objeto: 'Coisa não fungível', Natureza: 'Gratuito', Finalidade: 'Uso', Restituição: 'A mesma coisa' },
     mutuo: { name: 'Mútuo', Objeto: 'Coisa fungível', Natureza: 'Gratuito ou Oneroso', Finalidade: 'Consumo', Restituição: 'Mesmo gênero/qualidade' },
     deposito: { name: 'Depósito', Objeto: 'Coisa móvel', Natureza: 'Gratuito ou Oneroso', Finalidade: 'Guarda', Restituição: 'A mesma coisa' },
-    leasing: { name: 'Leasing', Objeto: 'Qualquer bem', Natureza: 'Oneroso (Complexo)', Finalidade: 'Uso com opção de compra', Restituição: 'Devolver ou Comprar' }
+    leasing: { name: 'Leasing', Objeto: 'Qualquer bem', Natureza: 'Oneroso (Complexo)', Finalidade: 'Uso com opção de compra', Restituição: 'Devolver ou Comprar' },
+    empreitada: { name: 'Empreitada', Objeto: 'Obra (Resultado)', Natureza: 'Oneroso', Finalidade: 'Execução de obra', Restituição: 'Não se aplica (entrega)' },
+    prestacao_servicos: { name: 'Prestação de Serviços', Objeto: 'Atividade (Meio)', Natureza: 'Oneroso', Finalidade: 'Realização de serviço', Restituição: 'Não se aplica' }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -438,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
         exemplo: '🛠️',
         jurisprudencia: '🏛️',
         artigos: '📜',
-        dicas: '🧠',
+        dicas: '�',
         quiz: '❓',
         requisitos: '✅',
         tipos: '📚',
@@ -461,36 +576,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        nav.innerHTML = '';
-        for (const categoryName in categories) {
-            const categoryHeader = document.createElement('h3');
-            categoryHeader.className = 'px-4 pt-4 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider';
-            categoryHeader.textContent = categoryName;
-            nav.appendChild(categoryHeader);
+        const categoryOrder = ["Uso e Fruição", "Atividade Humana", "Associativos", "Representação e Intervenção", "Empréstimo e Guarda", "Responsabilidade Civil", "Ferramentas"];
 
-            categories[categoryName].forEach(topic => {
-                const a = document.createElement('a');
-                a.href = '#';
-                a.dataset.topic = topic.id;
-                a.className = 'nav-link block px-4 py-2 text-sm text-gray-700 rounded-md';
-                a.textContent = topic.title;
-                if (topic.id === currentTopicId) {
-                    a.classList.add('active');
-                }
-                nav.appendChild(a);
-            });
-        }
+        nav.innerHTML = '';
+        categoryOrder.forEach(categoryName => {
+            if (categories[categoryName]) {
+                const categoryHeader = document.createElement('h3');
+                categoryHeader.className = 'px-4 pt-4 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider';
+                categoryHeader.textContent = categoryName;
+                nav.appendChild(categoryHeader);
+
+                categories[categoryName].forEach(topic => {
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.dataset.topic = topic.id;
+                    a.className = 'nav-link block px-4 py-2 text-sm text-gray-700 rounded-md';
+                    a.textContent = topic.title;
+                    if (topic.id === currentTopicId) {
+                        a.classList.add('active');
+                    }
+                    nav.appendChild(a);
+                });
+            }
+        });
     }
 
     function createCard(cardData) {
         const icon = icons[cardData.type] || '⭐';
         return `
             <div class="card p-5">
-                <h4 class="text-lg font-bold mb-3 flex items-center">
-                    <span class="text-2xl mr-3">${icon}</span>
-                    ${cardData.title}
-                </h4>
-                <div class="text-gray-700 space-y-2">${cardData.content}</div>
+                <div class="card-content">
+                    <h4 class="text-lg font-bold mb-3 flex items-center">
+                        <span class="text-2xl mr-3">${icon}</span>
+                        ${cardData.title}
+                    </h4>
+                    <div class="text-gray-700 space-y-2">${cardData.content}</div>
+                </div>
             </div>
         `;
     }
@@ -508,11 +629,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div class="card p-5">
-                <h4 class="text-lg font-bold mb-3 flex items-center">
-                    <span class="text-2xl mr-3">${icons.quiz}</span>
-                    ${cardData.title}
-                </h4>
-                <div class="text-gray-700">${questionsHtml}</div>
+                <div class="card-content">
+                    <h4 class="text-lg font-bold mb-3 flex items-center">
+                        <span class="text-2xl mr-3">${icons.quiz}</span>
+                        ${cardData.title}
+                    </h4>
+                    <div class="text-gray-700">${questionsHtml}</div>
+                </div>
             </div>
         `;
     }
@@ -520,12 +643,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function createChartCard(cardData) {
         return `
             <div class="card p-5">
-                 <h4 class="text-lg font-bold mb-3 flex items-center">
-                    <span class="text-2xl mr-3">${icons.diagrama}</span>
-                    ${cardData.title}
-                </h4>
-                <div class="chart-container">
-                    <canvas id="dynamicChart"></canvas>
+                <div class="card-content">
+                     <h4 class="text-lg font-bold mb-3 flex items-center">
+                        <span class="text-2xl mr-3">${icons.diagrama}</span>
+                        ${cardData.title}
+                    </h4>
+                    <div class="chart-container">
+                        <canvas id="dynamicChart"></canvas>
+                    </div>
                 </div>
             </div>
         `;
@@ -540,16 +665,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const topic = apostilaData[currentTopicId];
         headerTitle.textContent = topic.title;
         mainContent.innerHTML = '';
+        mainContent.scrollTop = 0;
 
         if (topic.subtopics) {
-            // Render tabs for subtopics
             const subTopicKeys = Object.keys(topic.subtopics);
             currentSubTopicId = currentSubTopicId && topic.subtopics[currentSubTopicId] ? currentSubTopicId : subTopicKeys[0];
             
             const tabsHtml = `
-                <div class="flex border-b border-gray-200 mb-6 space-x-4">
+                <div class="flex border-b border-gray-200 mb-6 space-x-1 md:space-x-4 overflow-x-auto">
                     ${subTopicKeys.map(key => `
-                        <button class="tab-button py-2 px-1 text-gray-500 hover:text-gray-800 ${key === currentSubTopicId ? 'active' : ''}" data-subtopic="${key}">
+                        <button class="tab-button py-2 px-2 md:px-1 text-sm md:text-base text-gray-500 hover:text-gray-800 flex-shrink-0 ${key === currentSubTopicId ? 'active' : ''}" data-subtopic="${key}">
                             ${topic.subtopics[key].title}
                         </button>
                     `).join('')}
@@ -575,7 +700,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             mainContent.appendChild(grid);
             
-            // Render chart if it exists
             const chartDataCard = subtopicContent.find(c => c.type === 'diagrama' && c.chartType === 'bar');
             if (chartDataCard) {
                 const ctx = document.getElementById('dynamicChart').getContext('2d');
@@ -593,7 +717,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Add event listeners for new content
         mainContent.querySelectorAll('.toggle-answer-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const answerDiv = btn.nextElementSibling;
@@ -633,9 +756,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (selected.length > 3) {
-                 // Uncheck the last checked item
                 this.checked = false;
+                const lastSelected = Array.from(optionsContainer.querySelectorAll('.comparator-checkbox:checked')).map(box => box.value);
                 alert('Você pode comparar no máximo 3 contratos por vez.');
+                updateComparatorTable();
                 return;
             }
 
@@ -654,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${features.map(feature => `
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${feature}</td>
-                                    ${selected.map(key => `<td class="px-6 py-4 whitespace-nowrap text-gray-600">${contractComparisonData[key][feature]}</td>`).join('')}
+                                    ${selected.map(key => `<td class="px-6 py-4 whitespace-nowrap text-gray-600">${contractComparisonData[key][feature] || 'N/A'}</td>`).join('')}
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -675,7 +799,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.tagName === 'A' && e.target.dataset.topic) {
             e.preventDefault();
             currentTopicId = e.target.dataset.topic;
-            currentSubTopicId = null; // Reset subtopic when changing main topic
+            currentSubTopicId = null; 
             render();
             if (window.innerWidth < 768) {
                 sidebar.classList.add('-translate-x-full');
@@ -687,7 +811,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.toggle('-translate-x-full');
     });
 
-    // Initial render
     render();
 });
 </script>
