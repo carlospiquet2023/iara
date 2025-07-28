@@ -9,115 +9,160 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Study -->
-    <!-- Application Structure Plan: A aplicação foi estruturada como um dashboard de aprendizado interativo. Em vez de seguir a ordem linear da apostila, os contratos foram agrupados por afinidade temática (Uso e Fruição, Atividade Humana, Associativos, etc.) em uma barra de navegação lateral persistente. Esta abordagem permite ao usuário uma navegação não-linear e facilita a comparação entre institutos jurídicos semelhantes. O conteúdo de cada contrato é apresentado em cartões interativos (conceito, exemplo, jurisprudência, quiz), quebrando a densidade do texto e organizando a informação em blocos de fácil digestão. A interatividade é o pilar: quizzes com respostas ocultas, diagramas e um comparador de contratos foram criados para transformar a leitura passiva em estudo ativo, reforçando o aprendizado. -->
-    <!-- Visualization & Content Choices: Para comparar contratos (ex: Locação vs. Comodato vs. Mútuo), foi criado um seletor dinâmico que gera uma tabela comparativa em HTML, uma abordagem mais clara e direta que um gráfico complexo. Para a responsabilidade do empreiteiro (Art. 618), um gráfico de barras (Chart.js) foi usado para visualizar a relação entre os prazos de garantia e prescrição, tornando a informação numérica mais impactante. Processos, como a extinção da sociedade, foram representados por diagramas simples feitos com HTML/CSS (Flexbox e caracteres Unicode), evitando bibliotecas externas e mantendo a clareza. Cada escolha visa a máxima didática e interatividade, convertendo o conteúdo da apostila em uma experiência de aprendizado engajadora. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        :root {
+            --color-background: #0d1117;
+            --color-surface: #161b22;
+            --color-primary: #f59e0b; /* Amber 500 */
+            --color-secondary: #38bdf8; /* Light Blue 400 */
+            --color-text: #e6edf3;
+            --color-text-muted: #7d8590;
+            --color-border: #30363d;
+            --font-sans: 'Inter', sans-serif;
+            --font-serif: 'Lora', serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F8F7F4; /* Warm neutral background */
-            color: #4A4A4A;
+            font-family: var(--font-sans);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            min-height: 100vh;
+            overflow: hidden;
         }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, rgba(22, 27, 34, 0.5), var(--color-background) 70%);
+            pointer-events: none;
+        }
+
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Lora', serif;
-            color: #2C3E50; /* Dark blue-gray for headers */
+            font-family: var(--font-serif);
+            color: var(--color-primary);
+            letter-spacing: 0.5px;
         }
-        .nav-link {
-            transition: all 0.2s ease-in-out;
-            border-left: 4px solid transparent;
-        }
-        .nav-link:hover {
-            background-color: #EAE8E1;
-            border-left-color: #D4A373; /* Subtle accent */
-        }
-        .nav-link.active {
-            background-color: #EAE8E1;
-            border-left-color: #BF8B5E; /* Stronger accent for active */
-            font-weight: 600;
-            color: #2C3E50;
-        }
+
         .card {
-            background-color: #FFFFFF;
-            border: 1px solid #EAE8E1;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
         }
+
         .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-5px);
+            border-color: var(--color-primary);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 20px rgba(245, 158, 11, 0.2);
         }
+
         .card-content {
             flex-grow: 1;
         }
-        .tab-button {
+
+        .nav-link {
             transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .nav-link.active {
+            background-color: rgba(245, 158, 11, 0.15);
+            border-left-color: var(--color-primary);
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        #sidebar {
+            background-color: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+        }
+
+        header {
+            background-color: rgba(13, 17, 23, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        #main-content {
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .content-loading {
+            opacity: 0;
+        }
+
+        .tab-button {
             border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
         }
         .tab-button.active {
-            border-bottom-color: #BF8B5E;
-            color: #2C3E50;
+            border-bottom-color: var(--color-primary);
+            color: var(--color-primary);
             font-weight: 600;
         }
+
         .quiz-answer {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding-top: 0;
+            padding-bottom: 0;
         }
         .quiz-answer.show {
-            max-height: 200px; /* Adjust as needed */
+            max-height: 200px;
+            padding-top: 0.75rem; /* 12px */
+            padding-bottom: 0.75rem; /* 12px */
         }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
-        }
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 300px;
-            }
+
+        ::selection {
+            background: var(--color-primary);
+            color: var(--color-background);
         }
     </style>
 </head>
 <body class="antialiased">
-    <div class="flex h-screen bg-gray-100">
+    <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-[#F8F7F4] border-r border-gray-200 flex-shrink-0 overflow-y-auto transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full">
-            <div class="p-5">
-                <h1 class="text-xl font-bold text-gray-800">Direito Civil</h1>
-                <p class="text-sm text-gray-500 mt-1">Contratos e Obrigações</p>
+        <aside id="sidebar" class="w-72 flex-shrink-0 overflow-y-auto transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold">Direito Civil</h1>
+                <p class="text-sm text-amber-300">Contratos e Obrigações</p>
             </div>
-            <nav id="main-nav" class="flex flex-col p-2 space-y-1">
+            <nav id="main-nav" class="flex flex-col p-3 space-y-1">
                 <!-- Navigation links will be injected by JS -->
             </nav>
         </aside>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <header class="bg-white shadow-sm flex justify-between items-center p-4">
-                <button id="menu-toggle" class="md:hidden text-gray-600">
+            <header class="sticky top-0 z-10 flex justify-between items-center p-4">
+                <button id="menu-toggle" class="md:hidden text-gray-400 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
-                <div id="header-title" class="text-lg md:text-xl font-semibold text-gray-700">
+                <div id="header-title" class="text-lg md:text-xl font-semibold text-white">
                     Selecione um tema para começar
                 </div>
-                <div></div>
+                <div></div> <!-- Spacer -->
             </header>
-            <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8F7F4] p-4 md:p-8">
+            <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
                 <!-- Content will be injected by JS -->
-                 <div class="text-center py-16">
-                    <h2 class="text-3xl font-bold text-gray-800">Bem-vindo ao Manual Interativo!</h2>
-                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Navegue pelos temas na barra lateral para explorar os conceitos, exemplos práticos, jurisprudência e muito mais. Teste seu conhecimento com os quizzes interativos ao final de cada tópico.</p>
-                </div>
             </main>
         </div>
     </div>
@@ -128,8 +173,8 @@ const apostilaData = {
         title: "Introdução",
         content: `
             <div class="text-center py-16">
-                <h2 class="text-3xl font-bold text-gray-800">Bem-vindo ao Manual Interativo!</h2>
-                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Navegue pelos temas na barra lateral para explorar os conceitos, exemplos práticos, jurisprudência e muito mais. Teste seu conhecimento com os quizzes interativos ao final de cada tópico.</p>
+                <h2 class="text-4xl font-bold">Bem-vindo ao Manual Interativo!</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-400">Navegue pelos temas na barra lateral para explorar os conceitos, exemplos práticos, jurisprudência e muito mais. Teste seu conhecimento com os quizzes interativos ao final de cada tópico.</p>
             </div>
         `
     },
@@ -272,8 +317,8 @@ const apostilaData = {
                         datasets: [{
                             label: 'Prazo em Anos',
                             data: [5, 10],
-                            backgroundColor: ['rgba(212, 163, 115, 0.6)', 'rgba(44, 62, 80, 0.6)'],
-                            borderColor: ['rgb(212, 163, 115)', 'rgb(44, 62, 80)'],
+                            backgroundColor: ['rgba(245, 158, 11, 0.6)', 'rgba(56, 189, 248, 0.6)'],
+                            borderColor: ['rgb(245, 158, 11)', 'rgb(56, 189, 248)'],
                             borderWidth: 1
                         }]
                     }, options: {
@@ -323,19 +368,19 @@ const apostilaData = {
                     { type: 'conceito', title: 'Administração', content: 'É exercida por sócios ou não-sócios, conforme o contrato social. Se o contrato for omisso, a administração compete separadamente a cada sócio (Art. 1.013, CC).' },
                     { type: 'diagrama', title: 'Fases da Extinção da Sociedade', content: `
                         <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
-                            <div class="p-4 bg-blue-100 rounded-lg shadow">
-                                <h4 class="font-bold">1. Dissolução</h4>
-                                <p class="text-sm">Ato que inicia o fim (decisão dos sócios, fim do prazo, etc.)</p>
+                            <div class="p-4 bg-gray-800 rounded-lg shadow-lg">
+                                <h4 class="font-bold text-blue-400">1. Dissolução</h4>
+                                <p class="text-sm text-gray-400">Ato que inicia o fim (decisão dos sócios, fim do prazo, etc.)</p>
                             </div>
-                            <div class="text-2xl font-bold text-gray-400">→</div>
-                            <div class="p-4 bg-yellow-100 rounded-lg shadow">
-                                <h4 class="font-bold">2. Liquidação</h4>
-                                <p class="text-sm">Vender ativos, pagar passivos e partilhar o saldo.</p>
+                            <div class="text-2xl font-bold text-gray-600">→</div>
+                            <div class="p-4 bg-gray-800 rounded-lg shadow-lg">
+                                <h4 class="font-bold text-yellow-400">2. Liquidação</h4>
+                                <p class="text-sm text-gray-400">Vender ativos, pagar passivos e partilhar o saldo.</p>
                             </div>
-                            <div class="text-2xl font-bold text-gray-400">→</div>
-                            <div class="p-4 bg-green-100 rounded-lg shadow">
-                                <h4 class="font-bold">3. Extinção</h4>
-                                <p class="text-sm">Cancelamento do registro. Fim da pessoa jurídica.</p>
+                            <div class="text-2xl font-bold text-gray-600">→</div>
+                            <div class="p-4 bg-gray-800 rounded-lg shadow-lg">
+                                <h4 class="font-bold text-green-400">3. Extinção</h4>
+                                <p class="text-sm text-gray-400">Cancelamento do registro. Fim da pessoa jurídica.</p>
                             </div>
                         </div>
                     `},
@@ -437,7 +482,7 @@ const apostilaData = {
                 content: [
                     { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 586, CC: É o empréstimo de <b>coisas fungíveis</b> (ex: dinheiro, grãos). O mutuário (quem recebe) se torna dono da coisa e se obriga a restituir outra de mesmo gênero, qualidade e quantidade.' },
                     { type: 'explicacao', title: 'Explicação Simples', content: 'É o "empréstimo para consumo". Você pede uma xícara de açúcar, usa, e depois devolve outra xícara de açúcar, não a mesma que pegou. O empréstimo de dinheiro é o exemplo mais comum.' },
-                    { type: 'diferenca', title: 'vs. Comodato', content: 'No <b>Mútuo</b>, a coisa é fungível e a propriedade é transferida. No <b>Comodato</b>, a coisa é infungível e se devolve o mesmo bem.' },
+                    { type: 'diferenca', title: 'vs. Comodato', content: 'No <b>Mútuo</b>, a coisa é fungível e a propriedade é transferida ao mutuário. No <b>Comodato</b>, a coisa é infungível e se devolve o mesmo bem.' },
                     { type: 'dicas', title: 'Dica de Memorização', content: '<b>M</b>útuo = <b>M</b>esma espécie, <b>M</b>esma qualidade, <b>M</b>esma quantidade.' },
                     { type: 'quiz', title: 'Mini Quiz', questions: [
                         { q: 'João empresta R$ 1.000 a Pedro. Qual contrato foi celebrado?', a: 'b) Mútuo.' },
@@ -514,10 +559,10 @@ const apostilaData = {
         title: "Comparador de Contratos",
         category: "Ferramentas",
         content: `
-            <div class="p-4 bg-white rounded-lg shadow">
-                <h3 class="text-xl font-bold mb-4">Compare Contratos Lado a Lado</h3>
-                <p class="mb-4 text-gray-600">Selecione dois ou três contratos para ver suas principais diferenças e semelhanças.</p>
-                <div class="flex flex-wrap gap-4 mb-6" id="comparator-options">
+            <div class="p-6 bg-gray-900 rounded-lg shadow-inner">
+                <h3 class="text-2xl font-bold mb-4">Compare Contratos Lado a Lado</h3>
+                <p class="mb-6 text-gray-400">Selecione dois ou três contratos para ver suas principais diferenças e semelhanças.</p>
+                <div class="flex flex-wrap gap-x-6 gap-y-4 mb-6" id="comparator-options">
                     <!-- Checkboxes will be inserted here -->
                 </div>
                 <div id="comparator-table-container"></div>
@@ -548,20 +593,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeChart = null;
 
     const icons = {
-        conceito: '⚖️',
-        explicacao: '💡',
-        exemplo: '🛠️',
-        jurisprudencia: '🏛️',
-        artigos: '📜',
-        dicas: '�',
-        quiz: '❓',
-        requisitos: '✅',
-        tipos: '📚',
-        diferenca: '🔄',
-        deveres: '➡️',
-        direitos: '⬅️',
-        caso: '🔍',
-        diagrama: '📊'
+        conceito: '⚖️', explicacao: '💡', exemplo: '🛠️', jurisprudencia: '🏛️',
+        artigos: '📜', dicas: '🧠', quiz: '❓', requisitos: '✅',
+        tipos: '📚', diferenca: '🔄', deveres: '➡️', direitos: '⬅️',
+        caso: '🔍', diagrama: '📊'
     };
 
     function renderNav() {
@@ -569,9 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(apostilaData).forEach(id => {
             const topic = apostilaData[id];
             if (topic.category) {
-                if (!categories[topic.category]) {
-                    categories[topic.category] = [];
-                }
+                if (!categories[topic.category]) categories[topic.category] = [];
                 categories[topic.category].push({ id, title: topic.title });
             }
         });
@@ -582,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
         categoryOrder.forEach(categoryName => {
             if (categories[categoryName]) {
                 const categoryHeader = document.createElement('h3');
-                categoryHeader.className = 'px-4 pt-4 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider';
+                categoryHeader.className = 'px-4 pt-4 pb-2 text-xs font-bold uppercase tracking-wider text-gray-500';
                 categoryHeader.textContent = categoryName;
                 nav.appendChild(categoryHeader);
 
@@ -590,11 +623,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const a = document.createElement('a');
                     a.href = '#';
                     a.dataset.topic = topic.id;
-                    a.className = 'nav-link block px-4 py-2 text-sm text-gray-700 rounded-md';
+                    a.className = `nav-link block px-4 py-2 text-sm rounded-md ${topic.id === currentTopicId ? 'active' : ''}`;
                     a.textContent = topic.title;
-                    if (topic.id === currentTopicId) {
-                        a.classList.add('active');
-                    }
                     nav.appendChild(a);
                 });
             }
@@ -610,7 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="text-2xl mr-3">${icon}</span>
                         ${cardData.title}
                     </h4>
-                    <div class="text-gray-700 space-y-2">${cardData.content}</div>
+                    <div class="text-gray-300 space-y-2">${cardData.content}</div>
                 </div>
             </div>
         `;
@@ -618,11 +648,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function createQuizCard(cardData) {
         const questionsHtml = cardData.questions.map((q, index) => `
-            <div class="mt-4 border-t border-gray-200 pt-3">
-                <p class="font-semibold">${index + 1}. ${q.q}</p>
-                <button class="text-sm text-blue-600 hover:text-blue-800 font-semibold mt-2 toggle-answer-btn">Mostrar Resposta</button>
-                <div class="quiz-answer mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p class="text-green-800">${q.a}</p>
+            <div class="mt-4 border-t border-gray-700 pt-4">
+                <p class="font-semibold text-gray-200">${index + 1}. ${q.q}</p>
+                <button class="text-sm font-semibold mt-2 toggle-answer-btn text-blue-400 hover:text-blue-300">Mostrar Resposta</button>
+                <div class="quiz-answer mt-2 p-3 rounded-lg bg-gray-900 border border-gray-700">
+                    <p>${q.a}</p>
                 </div>
             </div>
         `).join('');
@@ -634,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="text-2xl mr-3">${icons.quiz}</span>
                         ${cardData.title}
                     </h4>
-                    <div class="text-gray-700">${questionsHtml}</div>
+                    <div>${questionsHtml}</div>
                 </div>
             </div>
         `;
@@ -648,9 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="text-2xl mr-3">${icons.diagrama}</span>
                         ${cardData.title}
                     </h4>
-                    <div class="chart-container">
-                        <canvas id="dynamicChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="dynamicChart"></canvas></div>
                 </div>
             </div>
         `;
@@ -664,63 +692,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const topic = apostilaData[currentTopicId];
         headerTitle.textContent = topic.title;
-        mainContent.innerHTML = '';
-        mainContent.scrollTop = 0;
+        
+        mainContent.classList.add('content-loading');
 
-        if (topic.subtopics) {
-            const subTopicKeys = Object.keys(topic.subtopics);
-            currentSubTopicId = currentSubTopicId && topic.subtopics[currentSubTopicId] ? currentSubTopicId : subTopicKeys[0];
-            
-            const tabsHtml = `
-                <div class="flex border-b border-gray-200 mb-6 space-x-1 md:space-x-4 overflow-x-auto">
-                    ${subTopicKeys.map(key => `
-                        <button class="tab-button py-2 px-2 md:px-1 text-sm md:text-base text-gray-500 hover:text-gray-800 flex-shrink-0 ${key === currentSubTopicId ? 'active' : ''}" data-subtopic="${key}">
-                            ${topic.subtopics[key].title}
-                        </button>
-                    `).join('')}
-                </div>
-            `;
-            mainContent.innerHTML += tabsHtml;
+        setTimeout(() => {
+            mainContent.innerHTML = '';
+            mainContent.scrollTop = 0;
 
-            const subtopicContent = topic.subtopics[currentSubTopicId].content;
-            const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
-            
-            subtopicContent.forEach(cardData => {
-                let cardHtml = '';
-                if (cardData.type === 'quiz') {
-                    cardHtml = createQuizCard(cardData);
-                } else if (cardData.type === 'diagrama' && cardData.chartType === 'bar') {
-                    cardHtml = createChartCard(cardData);
-                }
-                else {
-                    cardHtml = createCard(cardData);
-                }
-                grid.innerHTML += cardHtml;
-            });
-            mainContent.appendChild(grid);
-            
-            const chartDataCard = subtopicContent.find(c => c.type === 'diagrama' && c.chartType === 'bar');
-            if (chartDataCard) {
-                const ctx = document.getElementById('dynamicChart').getContext('2d');
-                activeChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: chartDataCard.data,
-                    options: chartDataCard.options
+            if (topic.subtopics) {
+                const subTopicKeys = Object.keys(topic.subtopics);
+                currentSubTopicId = currentSubTopicId && topic.subtopics[currentSubTopicId] ? currentSubTopicId : subTopicKeys[0];
+                
+                const tabsHtml = `
+                    <div class="flex border-b border-gray-700 mb-6 space-x-2 md:space-x-4 overflow-x-auto">
+                        ${subTopicKeys.map(key => `
+                            <button class="tab-button py-2 px-2 md:px-4 text-sm md:text-base flex-shrink-0 text-gray-400 ${key === currentSubTopicId ? 'active' : ''}" data-subtopic="${key}">
+                                ${topic.subtopics[key].title}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                mainContent.innerHTML += tabsHtml;
+
+                const subtopicContent = topic.subtopics[currentSubTopicId].content;
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6';
+                
+                subtopicContent.forEach(cardData => {
+                    let cardHtml = '';
+                    if (cardData.type === 'quiz') cardHtml = createQuizCard(cardData);
+                    else if (cardData.type === 'diagrama' && cardData.chartType === 'bar') cardHtml = createChartCard(cardData);
+                    else cardHtml = createCard(cardData);
+                    grid.innerHTML += cardHtml;
                 });
+                mainContent.appendChild(grid);
+                
+                const chartDataCard = subtopicContent.find(c => c.type === 'diagrama' && c.chartType === 'bar');
+                if (chartDataCard) {
+                    const ctx = document.getElementById('dynamicChart').getContext('2d');
+                    activeChart = new Chart(ctx, { type: 'bar', data: chartDataCard.data, options: chartDataCard.options });
+                }
+
+            } else {
+                mainContent.innerHTML = topic.content;
+                if (currentTopicId === 'comparador') setupComparator();
             }
 
-        } else {
-            mainContent.innerHTML = topic.content;
-            if (currentTopicId === 'comparador') {
-                setupComparator();
-            }
-        }
+            mainContent.classList.remove('content-loading');
+            attachEventListeners();
+        }, 200); // Match timeout with CSS transition
+    }
 
+    function attachEventListeners() {
         mainContent.querySelectorAll('.toggle-answer-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const answerDiv = btn.nextElementSibling;
-                answerDiv.classList.toggle('show');
+                btn.nextElementSibling.classList.toggle('show');
             });
         });
 
@@ -737,9 +763,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const tableContainer = document.getElementById('comparator-table-container');
         
         optionsContainer.innerHTML = Object.keys(contractComparisonData).map(key => `
-            <div>
-                <input type="checkbox" id="compare-${key}" value="${key}" class="comparator-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <label for="compare-${key}" class="ml-2 text-gray-700">${contractComparisonData[key].name}</label>
+            <div class="flex items-center">
+                <input type="checkbox" id="compare-${key}" value="${key}" class="comparator-checkbox h-4 w-4 rounded border-gray-600 bg-gray-800 text-amber-500 focus:ring-amber-500">
+                <label for="compare-${key}" class="ml-2 text-gray-300">${contractComparisonData[key].name}</label>
             </div>
         `).join('');
 
@@ -757,9 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (selected.length > 3) {
                 this.checked = false;
-                const lastSelected = Array.from(optionsContainer.querySelectorAll('.comparator-checkbox:checked')).map(box => box.value);
                 alert('Você pode comparar no máximo 3 contratos por vez.');
-                updateComparatorTable();
                 return;
             }
 
@@ -768,17 +792,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let tableHTML = `
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full border border-gray-700">
+                        <thead class="bg-gray-800">
                             <tr>
-                                ${headers.map(h => `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${h}</th>`).join('')}
+                                ${headers.map(h => `<th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">${h}</th>`).join('')}
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y divide-gray-700">
                             ${features.map(feature => `
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${feature}</td>
-                                    ${selected.map(key => `<td class="px-6 py-4 whitespace-nowrap text-gray-600">${contractComparisonData[key][feature] || 'N/A'}</td>`).join('')}
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-200">${feature}</td>
+                                    ${selected.map(key => `<td class="px-6 py-4 whitespace-nowrap text-gray-400">${contractComparisonData[key][feature] || 'N/A'}</td>`).join('')}
                                 </tr>
                             `).join('')}
                         </tbody>
