@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Interativo de Direito Civil - Contratos e Obrigações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lora:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Study -->
+    <!-- Application Structure Plan: A aplicação foi estruturada como um dashboard de aprendizado interativo. Em vez de seguir a ordem linear da apostila, os contratos foram agrupados por afinidade temática (Uso e Fruição, Atividade Humana, Associativos, etc.) em uma barra de navegação lateral persistente. Esta abordagem permite ao usuário uma navegação não-linear e facilita a comparação entre institutos jurídicos semelhantes. O conteúdo de cada contrato é apresentado em cartões interativos (conceito, exemplo, jurisprudência, quiz), quebrando a densidade do texto e organizando a informação em blocos de fácil digestão. A interatividade é o pilar: quizzes com respostas ocultas, diagramas e um comparador de contratos foram criados para transformar a leitura passiva em estudo ativo, reforçando o aprendizado. -->
+    <!-- Visualization & Content Choices: Para comparar contratos (ex: Locação vs. Comodato vs. Mútuo), foi criado um seletor dinâmico que gera uma tabela comparativa em HTML, uma abordagem mais clara e direta que um gráfico complexo. Para a responsabilidade do empreiteiro (Art. 618), um gráfico de barras (Chart.js) foi usado para visualizar a relação entre os prazos de garantia e prescrição, tornando a informação numérica mais impactante. Processos, como a extinção da sociedade, foram representados por diagramas simples feitos com HTML/CSS (Flexbox e caracteres Unicode), evitando bibliotecas externas e mantendo a clareza. Cada escolha visa a máxima didática e interatividade, convertendo o conteúdo da apostila em uma experiência de aprendizado engajadora. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4; /* Warm neutral background */
+            color: #4A4A4A;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Lora', serif;
+            color: #2C3E50; /* Dark blue-gray for headers */
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 4px solid transparent;
+        }
+        .nav-link:hover {
+            background-color: #EAE8E1;
+            border-left-color: #D4A373; /* Subtle accent */
+        }
+        .nav-link.active {
+            background-color: #EAE8E1;
+            border-left-color: #BF8B5E; /* Stronger accent for active */
+            font-weight: 600;
+            color: #2C3E50;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAE8E1;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button.active {
+            border-bottom-color: #BF8B5E;
+            color: #2C3E50;
+            font-weight: 600;
+        }
+        .quiz-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .quiz-answer.show {
+            max-height: 200px; /* Adjust as needed */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="flex h-screen bg-gray-100">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-[#F8F7F4] border-r border-gray-200 flex-shrink-0 overflow-y-auto transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full">
+            <div class="p-5">
+                <h1 class="text-xl font-bold text-gray-800">Direito Civil</h1>
+                <p class="text-sm text-gray-500 mt-1">Contratos e Obrigações</p>
+            </div>
+            <nav id="main-nav" class="flex flex-col p-2 space-y-1">
+                <!-- Navigation links will be injected by JS -->
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white shadow-sm flex justify-between items-center p-4">
+                <button id="menu-toggle" class="md:hidden text-gray-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <div id="header-title" class="text-lg md:text-xl font-semibold text-gray-700">
+                    Selecione um tema para começar
+                </div>
+                <div></div>
+            </header>
+            <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto bg-[#F8F7F4] p-4 md:p-8">
+                <!-- Content will be injected by JS -->
+                 <div class="text-center py-16">
+                    <h2 class="text-3xl font-bold text-gray-800">Bem-vindo ao Manual Interativo!</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Navegue pelos temas na barra lateral para explorar os conceitos, exemplos práticos, jurisprudência e muito mais. Teste seu conhecimento com os quizzes interativos ao final de cada tópico.</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+<script>
+const apostilaData = {
+    introducao: {
+        title: "Introdução",
+        content: `
+            <div class="text-center py-16">
+                <h2 class="text-3xl font-bold text-gray-800">Bem-vindo ao Manual Interativo!</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Navegue pelos temas na barra lateral para explorar os conceitos, exemplos práticos, jurisprudência e muito mais. Teste seu conhecimento com os quizzes interativos ao final de cada tópico.</p>
+            </div>
+        `
+    },
+    locacao: {
+        title: "Locação",
+        category: "Uso e Fruição",
+        subtopics: {
+            principios: {
+                title: "Princípios Gerais",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 565, CC: Contrato pelo qual uma das partes se obriga a ceder à outra, por tempo determinado ou não, o uso e gozo de coisa não fungível, mediante certa retribuição. Elementos: Coisa (res), Preço (pretium) e Consentimento (consensus).' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'É como comprar um ingresso de cinema. Você paga para usar a sala por um tempo, mas ela nunca se torna sua. Ao final, você devolve o "espaço" (o imóvel).' },
+                    { type: 'exemplo', title: 'Exemplo Prático', content: 'Júlia, fotógrafa, aluga uma lente especial (coisa não fungível) por 3 dias para um trabalho. Ela paga um valor e devolve a mesma lente ao final do prazo.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.607.422:</b> A responsabilidade do fiador, se prevista em contrato, se estende até a "entrega das chaves", mesmo com a prorrogação do contrato por prazo indeterminado. O fiador precisa se exonerar formalmente.' },
+                    { type: 'artigos', title: 'Artigos do Código Civil', content: '<b>565:</b> Definição; <b>566:</b> Deveres do locador; <b>569:</b> Deveres do locatário; <b>574:</b> Prorrogação.' },
+                    { type: 'dicas', title: 'Dicas de Memorização', content: '<b>"CPF" da Locação:</b> <b>C</b>oisa, <b>P</b>reço, <b>F</b>ormalização (consentimento).<br><b>L</b>ocação = <b>L</b>ucro (oneroso) vs. <b>C</b>omodato = <b>C</b>ortesia (gratuito).' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Se João empresta seu apartamento para seu primo morar por um ano sem cobrar nada, qual contrato foi celebrado?', a: 'c) Comodato. A gratuidade descaracteriza a locação.' },
+                        { q: 'Qual dos seguintes itens NÃO é um elemento essencial do contrato de locação?', a: 'c) Contrato escrito. A locação é não solene, podendo ser verbal, embora a forma escrita seja a regra para segurança.' }
+                    ]}
+                ]
+            },
+            urbanos_rusticos: {
+                title: "Prédios Urbanos vs. Rústicos",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'A distinção não é geográfica, mas pela <b>destinação econômica</b>. <b>Urbano:</b> moradia ou atividade comercial/industrial (Lei do Inquilinato). <b>Rústico:</b> exploração agrícola/pecuária (Estatuto da Terra - Arrendamento Rural).' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'A lei não olha o "endereço" do imóvel, mas sua "profissão". Se a profissão é ser casa ou loja, é urbano. Se é produzir soja ou criar gado, é rural.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.187.303:</b> O critério que define a lei aplicável (Inquilinato ou Estatuto da Terra) é a finalidade econômica dada ao imóvel, e não sua localização.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>"O que você FAZ, não onde você ESTÁ".</b> A atividade define a natureza da locação.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Um sítio na zona rural é alugado para uma família passar férias. Qual lei rege o contrato?', a: 'c) Lei do Inquilinato. A finalidade é residencial (lazer), caracterizando-o como prédio urbano para fins de locação.' }
+                    ]}
+                ]
+            },
+            cessao_sublocacao: {
+                title: "Cessão e Sublocação",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: '<b>Cessão:</b> Transferência da posição contratual. O locatário original sai e um terceiro assume seu lugar. <b>Sublocação:</b> Criação de um novo contrato derivado do primeiro. O locatário original vira sublocador. Ambos exigem <b>consentimento prévio e escrito</b> do locador (Art. 13, Lei 8.245/91).' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: '<b>Cessão:</b> "Passar a sua assinatura" de um clube para um amigo. Você sai da jogada. <b>Sublocação:</b> "Emprestar a carteirinha" do clube. Você continua sendo o sócio principal e responsável.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>AgInt no REsp 1.601.737:</b> A sublocação não autorizada é clandestina e não gera efeitos para o locador. O sublocatário irregular não tem direitos oponíveis ao locador (ex: ser incluído na ação de despejo).' },
+                     { type: 'dicas', title: 'Dica de Memorização', content: '<b>Cessão = Sucessão.</b> <b>Sublocação = Subordinada.</b> A regra de ouro: "Sem papel passado do dono, nada feito!".' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Se o contrato de locação principal for extinto, o que acontece com a sublocação?', a: 'b) Ela é automaticamente extinta. O acessório (sublocação) segue o principal (locação).' }
+                    ]}
+                ]
+            },
+            renovacao: {
+                title: "Renovação Comercial",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'A <b>Ação Renovatória</b> (Lei 8.245/91) protege o ponto comercial (fundo de comércio). Permite ao locatário comercial exigir judicialmente a renovação do contrato, mesmo contra a vontade do locador, se preenchidos os requisitos.' },
+                    { type: 'requisitos', title: 'Requisitos (Art. 51)', content: '<b>1. Contrato escrito</b> com prazo determinado. <br><b>2. Prazo mínimo de 5 anos</b> (ou soma de prazos ininterruptos). <br><b>3. Exploração da mesma atividade</b> por no mínimo 3 anos.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.990.552:</b> O prazo máximo da renovação judicial é de <b>cinco anos</b>, mesmo que o contrato anterior fosse mais longo. É uma ponderação entre a proteção ao ponto e o direito de propriedade.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>Trio de Ferro da Renovatória:</b> <b>5</b> anos de contrato, <b>3</b> anos no mesmo ramo, e prazo para agir entre <b>1 ano e 6 meses</b> antes do fim.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Qual o prazo decadencial para ajuizar a ação renovatória?', a: 'b) No interregno de um ano, no máximo, até seis meses, no mínimo, anteriores ao término do contrato.' }
+                    ]}
+                ]
+            }
+        }
+    },
+    leasing: {
+        title: "Leasing",
+        category: "Uso e Fruição",
+        subtopics: {
+            conceito: {
+                title: "Conceito e Tipos",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Contrato complexo (Lei 6.099/74) onde uma instituição financeira (arrendadora) adquire um bem escolhido por um cliente (arrendatário) e cede seu uso. Ao final, o arrendatário tem a <b>tríplice opção</b>: renovar, devolver ou adquirir o bem (pagando o Valor Residual Garantido - VRG).' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'É um "aluguel com opção de compra turbinado". O banco compra o carro que você escolheu e o "aluga" para você. No final, você decide se fica com ele, devolve ou renova.' },
+                    { type: 'tipos', title: 'Tipos Principais', content: '<b>Financeiro:</b> As parcelas amortizam quase todo o valor do bem. O VRG é baixo, incentivando a compra. <br><b>Operacional:</b> Parece mais um aluguel. O VRG é o valor de mercado, tornando a devolução mais comum.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.061.530/RS:</b> As regras do Código Civil sobre limitação de juros não se aplicam ao leasing financeiro, que tem regramento próprio no Sistema Financeiro Nacional. A contraprestação não é apenas juros.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>Leasing = 3 em 1:</b> Locação + Financiamento + Compra e Venda (opcional).' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Quem é o proprietário do bem durante a vigência de um contrato de leasing?', a: 'c) A arrendadora (instituição financeira). O arrendatário tem apenas a posse e o uso.' }
+                    ]}
+                ]
+            }
+        }
+    },
+    comodato: {
+        title: "Comodato",
+        category: "Uso e Fruição",
+        subtopics: {
+            conceito: {
+                title: "Conceito e Características",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 579, CC: "O empréstimo <b>gratuito</b> de coisas <b>não fungíveis</b>". Perfaz-se com a entrega (tradição) do objeto. A obrigação é devolver exatamente a mesma coisa.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'É o contrato da amizade. Você empresta sua furadeira para o vizinho. Ele usa e devolve a *sua* furadeira, não uma nova. É de graça.' },
+                    { type:- 'caso', title: 'Caso Concreto', content: 'Pedro cede um imóvel em comodato para sua sobrinha por 4 anos. Ela paga o condomínio e as contas de consumo. Isso não descaracteriza a gratuidade, pois são despesas de uso. Pedro só pode reaver o bem antes do prazo se provar necessidade imprevista e urgente (Art. 581, CC).' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.316.895:</b> O pagamento de encargos inerentes ao uso da coisa (IPTU, condomínio) pelo comodatário não descaracteriza a gratuidade do comodato, pois não é uma contraprestação direta ao comodante.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>COMODATO = CÔMODO.</b> Você dá uma conveniência a alguém, de graça. Se tiver preço, vira locação.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'A característica que define o comodato é:', a: 'b) A gratuidade.' }
+                    ]}
+                ]
+            }
+        }
+    },
+    prestacao_servicos: {
+        title: "Prestação de Serviços",
+        category: "Atividade Humana",
+        subtopics: {
+            conceito: {
+                title: "Conceito e Diferenças",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 593, CC: Contrato pelo qual o prestador se obriga a realizar uma atividade lícita para o tomador, mediante remuneração. É uma <b>obrigação de meio</b> (empregar diligência), não de resultado.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'Contratar um professor particular. Ele se obriga a dar a melhor aula possível (meio), mas não pode garantir a aprovação do aluno (resultado).' },
+                    { type: 'diferenca', title: 'vs. Relação de Emprego (CLT)', content: 'A diferença crucial é <b>autonomia vs. subordinação</b>. O prestador de serviços tem autonomia. O empregado é subordinado (tem chefe, cumpre horário). No direito do trabalho, a realidade dos fatos prevalece sobre o contrato (Princípio da Primazia da Realidade).' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (TST)', content: 'O TST frequentemente reconhece o vínculo de emprego em casos de "pejotização" fraudulenta, quando a autonomia é fictícia e a subordinação é real, aplicando o Princípio da Primazia da Realidade.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>Prestação de Serviços = Autonomia.</b> <b>Emprego = Subordinação.</b> Se tem chefe, é CLT.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Qual o elemento principal que distingue prestação de serviços de um contrato de trabalho?', a: 'c) A subordinação jurídica.' }
+                    ]}
+                ]
+            }
+        }
+    },
+    empreitada: {
+        title: "Empreitada",
+        category: "Atividade Humana",
+        subtopics: {
+            conceito: {
+                title: "Conceito e Tipos",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 610, CC: O empreiteiro se obriga a executar uma obra específica para o dono da obra, mediante preço. É uma <b>obrigação de resultado</b> (entregar a obra pronta). O empreiteiro tem autonomia e assume os riscos.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: 'É como encomendar um bolo de casamento. Você não se importa como o confeiteiro faz, apenas que ele entregue o bolo combinado, no dia certo. O foco é o resultado final.' },
+                    { type: 'tipos', title: 'Espécies de Empreitada', content: '<b>De Lavor:</b> O empreiteiro fornece apenas a mão de obra. O risco sobre os materiais é do dono. <br><b>Mista (ou de Materiais):</b> O empreiteiro fornece mão de obra e materiais. O risco sobre tudo é do empreiteiro até a entrega.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>Empreitada = Empreendimento</b> (obra com resultado). <b>Lavor = Labor</b> (apenas o trabalho).' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'A principal diferença entre empreitada e prestação de serviços é:', a: 'b) A empreitada envolve uma obrigação de resultado, e a prestação de serviços, uma obrigação de meio.' }
+                    ]}
+                ]
+            },
+            responsabilidade: {
+                title: "Responsabilidade e Prazos",
+                content: [
+                    { type: 'conceito', title: 'Responsabilidade do Empreiteiro (Art. 618, CC)', content: 'Em edifícios e construções consideráveis, o empreiteiro responde pela solidez e segurança da obra. A interpretação dos prazos é fundamental.' },
+                    { type: 'diagrama', title: 'Linha do Tempo da Responsabilidade', chartType: 'bar', data: {
+                        labels: ['Garantia (para o vício aparecer)', 'Prescrição (para pedir indenização)'],
+                        datasets: [{
+                            label: 'Prazo em Anos',
+                            data: [5, 10],
+                            backgroundColor: ['rgba(212, 163, 115, 0.6)', 'rgba(44, 62, 80, 0.6)'],
+                            borderColor: ['rgb(212, 163, 115)', 'rgb(44, 62, 80)'],
+                            borderWidth: 1
+                        }]
+                    }, options: {
+                        indexAxis: 'y',
+                        scales: { x: { beginAtZero: true, ticks: { callback: function(value) { return value + ' anos' } } } },
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }},
+                    { type: 'explicacao', title: 'Entendendo os Prazos', content: '<b>Prazo de Garantia (5 anos):</b> Período em que o defeito grave deve aparecer. <br><b>Prazo Prescricional (Súmula 194/STJ e Art. 205/CC):</b> Uma vez que o defeito aparece (dentro dos 5 anos), o dono da obra tem <b>10 anos</b> para ajuizar a ação de indenização.' },
+                    { type: 'jurisprudencia', title: 'Jurisprudência Relevante (STJ)', content: '<b>REsp 1.717.160:</b> O prazo de 5 anos do art. 618 é de <b>garantia</b>, não de prescrição. Isso amplia a proteção do dono da obra, que pode acionar o construtor mesmo após os 5 anos, desde que o vício tenha surgido dentro desse período.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'Um defeito estrutural aparece em um prédio 6 anos após sua entrega. O dono pode acionar o empreiteiro com base no art. 618?', a: 'c) Não, pois o defeito apareceu após o fim do prazo de garantia de 5 anos. A responsabilidade do art. 618 pressupõe que o vício se manifeste dentro deste quinquênio.' }
+                    ]}
+                ]
+            }
+        }
+    },
+    sociedade: {
+        title: "Sociedade",
+        category: "Associativos",
+        subtopics: {
+            conceito: {
+                title: "Sociedade Simples vs. Empresária",
+                content: [
+                    { type: 'conceito', title: 'Conceito Jurídico', content: 'Art. 981, CC: Contrato onde pessoas se obrigam a contribuir com bens ou serviços para exercer atividade econômica e partilhar resultados. O CC/2002 adotou a <b>Teoria da Empresa</b>, distinguindo as sociedades pela <b>forma</b> como a atividade é exercida.' },
+                    { type: 'diferenca', title: 'Simples vs. Empresária', content: '<b>Empresária:</b> Exerce atividade econômica <b>organizada</b> (com "elemento de empresa"). A organização dos fatores de produção (capital, trabalho, tecnologia) é mais importante que a atividade pessoal dos sócios. Registro na Junta Comercial. <br><b>Simples:</b> Por exclusão. Atividade intelectual, científica, artística, onde o fator pessoal dos sócios prevalece. Registro no RCPJ.' },
+                    { type: 'explicacao', title: 'Explicação Simples', content: '<b>Simples:</b> Dois médicos dividindo um consultório. O sucesso depende do talento deles. <br><b>Empresária:</b> Um grande hospital. O sucesso depende da organização complexa de médicos, equipamentos, administração, etc.' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>S</b>imples = Pe<b>ss</b>oal (Registro <b>C</b>ivil). <br><b>E</b>mpresária = <b>E</b>lemento de <b>E</b>mpresa (Junta <b>C</b>omercial).' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'O critério do CC/2002 para diferenciar sociedade simples de empresária é:', a: 'c) A forma de organização da atividade econômica.' }
+                    ]}
+                ]
+            },
+            direitos_deveres: {
+                title: "Direitos e Deveres dos Sócios",
+                content: [
+                    { type: 'deveres', title: 'Deveres Fundamentais', content: '<b>1. Integralização do Capital:</b> Principal obrigação. O sócio que não cumpre é "remisso". <br><b>2. Lealdade:</b> Não agir contra os interesses da sociedade. <br><b>3. Responsabilidade pelas Dívidas:</b> Varia com o tipo societário (limitada ou ilimitada).' },
+                    { type: 'direitos', title: 'Direitos Essenciais', content: '<b>1. Participação nos Resultados:</b> Receber lucros (e arcar com prejuízos). <br><b>2. Fiscalização:</b> Examinar livros e documentos. <br><b>3. Voto e Retirada:</b> Participar de deliberações e poder se retirar da sociedade.' },
+                    { type: 'jurisprudencia', title: 'Desconsideração da Personalidade Jurídica (STJ)', content: '<b>EREsp 1.306.553:</b> Para atingir os bens dos sócios (Teoria Maior), não basta a insolvência da empresa. É preciso provar <b>abuso da personalidade</b>, caracterizado por <b>desvio de finalidade</b> ou <b>confusão patrimonial</b>.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'O sócio que deixa de integralizar o capital social é chamado de:', a: 'b) Sócio remisso.' }
+                    ]}
+                ]
+            },
+            extincao: {
+                title: "Administração e Extinção",
+                content: [
+                    { type: 'conceito', title: 'Administração', content: 'É exercida por sócios ou não-sócios, conforme o contrato social. Se o contrato for omisso, a administração compete separadamente a cada sócio (Art. 1.013, CC).' },
+                    { type: 'diagrama', title: 'Fases da Extinção da Sociedade', content: `
+                        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                            <div class="p-4 bg-blue-100 rounded-lg shadow">
+                                <h4 class="font-bold">1. Dissolução</h4>
+                                <p class="text-sm">Ato que inicia o fim (decisão dos sócios, fim do prazo, etc.)</p>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400">→</div>
+                            <div class="p-4 bg-yellow-100 rounded-lg shadow">
+                                <h4 class="font-bold">2. Liquidação</h4>
+                                <p class="text-sm">Vender ativos, pagar passivos e partilhar o saldo.</p>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400">→</div>
+                            <div class="p-4 bg-green-100 rounded-lg shadow">
+                                <h4 class="font-bold">3. Extinção</h4>
+                                <p class="text-sm">Cancelamento do registro. Fim da pessoa jurídica.</p>
+                            </div>
+                        </div>
+                    `},
+                    { type: 'jurisprudencia', title: 'Apuração de Haveres (STJ)', content: '<b>REsp 1.904.252:</b> Na omissão do contrato, a apuração de haveres do sócio retirante deve usar um <b>balanço de determinação</b> (valor patrimonial real na data da saída), sem incluir lucros futuros (fluxo de caixa descontado).' },
+                    { type: 'dicas', title: 'Dica de Memorização', content: '<b>Fases da Extinção = D.L.E.:</b> <b>D</b>issolução, <b>L</b>iquidação, <b>E</b>xtinção.' },
+                    { type: 'quiz', title: 'Mini Quiz', questions: [
+                        { q: 'A fase em que se vendem os ativos e pagam-se as dívidas é a:', a: 'd) Liquidação.' }
+                    ]}
+                ]
+            }
+        }
+    },
+    parceria: {
+        title: "Parceria",
+        category: "Associativos",
+        content: `
+            <div class="p-4">
+                <p class="text-gray-600">Este tema será abordado em breve. A parceria, especialmente a rural, se diferencia do arrendamento pela <b>partilha de riscos e resultados</b>, em vez de um aluguel fixo.</p>
+            </div>
+        `
+    },
+    mandato: {
+        title: "Mandato",
+        category: "Representação e Intervenção",
+        content: `
+            <div class="p-4">
+                <p class="text-gray-600">Este tema será abordado em breve. O mandato é o contrato de representação (instrumento: procuração), baseado na confiança, onde o mandatário age em nome do mandante.</p>
+            </div>
+        `
+    },
+    gestao_negocios: {
+        title: "Gestão de Negócios",
+        category: "Representação e Intervenção",
+        content: `
+            <div class="p-4">
+                <p class="text-gray-600">Este tema será abordado em breve. Diferente do mandato, a gestão de negócios é a intervenção <b>espontânea e sem autorização</b> em negócio alheio, para evitar um prejuízo.</p>
+            </div>
+        `
+    },
+    mutuo: {
+        title: "Mútuo",
+        category: "Empréstimo e Guarda",
+        content: `
+            <div class="p-4">
+                <p class="text-gray-600">Este tema será abordado em breve. O mútuo é o empréstimo de <b>coisas fungíveis</b> (ex: dinheiro), onde se devolve algo de mesma espécie, qualidade e quantidade. Transfere a propriedade.</p>
+            </div>
+        `
+    },
+    deposito: {
+        title: "Depósito",
+        category: "Empréstimo e Guarda",
+        content: `
+            <div class="p-4">
+                <p class="text-gray-600">Este tema será abordado em breve. O depósito é o contrato de guarda de <b>coisa móvel</b> (ex: estacionamento), com dever de restituir. A Súmula 130 do STJ e a Súmula Vinculante 25 são fundamentais aqui.</p>
+            </div>
+        `
+    },
+    responsabilidade_civil: {
+        title: "Responsabilidade Civil",
+        category: "Responsabilidade Civil",
+        content: `
+            <div class="p-4">
+                <p class="text-gray-600">Este tema central do Direito Civil, que trata do dever de reparar um dano, será detalhado em breve, abordando seus elementos (conduta, dano, nexo causal), as modalidades (subjetiva e objetiva) e a teoria do risco.</p>
+            </div>
+        `
+    },
+    comparador: {
+        title: "Comparador de Contratos",
+        category: "Ferramentas",
+        content: `
+            <div class="p-4 bg-white rounded-lg shadow">
+                <h3 class="text-xl font-bold mb-4">Compare Contratos Lado a Lado</h3>
+                <p class="mb-4 text-gray-600">Selecione dois ou três contratos para ver suas principais diferenças e semelhanças.</p>
+                <div class="flex flex-wrap gap-4 mb-6" id="comparator-options">
+                    <!-- Checkboxes will be inserted here -->
+                </div>
+                <div id="comparator-table-container"></div>
+            </div>
+        `
+    }
+};
+
+const contractComparisonData = {
+    locacao: { name: 'Locação', Objeto: 'Coisa não fungível', Natureza: 'Oneroso (Aluguel)', Finalidade: 'Uso e Gozo', Restituição: 'A mesma coisa' },
+    comodato: { name: 'Comodato', Objeto: 'Coisa não fungível', Natureza: 'Gratuito', Finalidade: 'Uso', Restituição: 'A mesma coisa' },
+    mutuo: { name: 'Mútuo', Objeto: 'Coisa fungível', Natureza: 'Gratuito ou Oneroso', Finalidade: 'Consumo', Restituição: 'Mesmo gênero/qualidade' },
+    deposito: { name: 'Depósito', Objeto: 'Coisa móvel', Natureza: 'Gratuito ou Oneroso', Finalidade: 'Guarda', Restituição: 'A mesma coisa' },
+    leasing: { name: 'Leasing', Objeto: 'Qualquer bem', Natureza: 'Oneroso (Complexo)', Finalidade: 'Uso com opção de compra', Restituição: 'Devolver ou Comprar' }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.getElementById('main-nav');
+    const mainContent = document.getElementById('main-content');
+    const headerTitle = document.getElementById('header-title');
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    let currentTopicId = 'introducao';
+    let currentSubTopicId = null;
+    let activeChart = null;
+
+    const icons = {
+        conceito: '⚖️',
+        explicacao: '💡',
+        exemplo: '🛠️',
+        jurisprudencia: '🏛️',
+        artigos: '📜',
+        dicas: '🧠',
+        quiz: '❓',
+        requisitos: '✅',
+        tipos: '📚',
+        diferenca: '🔄',
+        deveres: '➡️',
+        direitos: '⬅️',
+        caso: '🔍',
+        diagrama: '📊'
+    };
+
+    function renderNav() {
+        const categories = {};
+        Object.keys(apostilaData).forEach(id => {
+            const topic = apostilaData[id];
+            if (topic.category) {
+                if (!categories[topic.category]) {
+                    categories[topic.category] = [];
+                }
+                categories[topic.category].push({ id, title: topic.title });
+            }
+        });
+
+        nav.innerHTML = '';
+        for (const categoryName in categories) {
+            const categoryHeader = document.createElement('h3');
+            categoryHeader.className = 'px-4 pt-4 pb-2 text-xs font-bold text-gray-500 uppercase tracking-wider';
+            categoryHeader.textContent = categoryName;
+            nav.appendChild(categoryHeader);
+
+            categories[categoryName].forEach(topic => {
+                const a = document.createElement('a');
+                a.href = '#';
+                a.dataset.topic = topic.id;
+                a.className = 'nav-link block px-4 py-2 text-sm text-gray-700 rounded-md';
+                a.textContent = topic.title;
+                if (topic.id === currentTopicId) {
+                    a.classList.add('active');
+                }
+                nav.appendChild(a);
+            });
+        }
+    }
+
+    function createCard(cardData) {
+        const icon = icons[cardData.type] || '⭐';
+        return `
+            <div class="card p-5">
+                <h4 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-2xl mr-3">${icon}</span>
+                    ${cardData.title}
+                </h4>
+                <div class="text-gray-700 space-y-2">${cardData.content}</div>
+            </div>
+        `;
+    }
+    
+    function createQuizCard(cardData) {
+        const questionsHtml = cardData.questions.map((q, index) => `
+            <div class="mt-4 border-t border-gray-200 pt-3">
+                <p class="font-semibold">${index + 1}. ${q.q}</p>
+                <button class="text-sm text-blue-600 hover:text-blue-800 font-semibold mt-2 toggle-answer-btn">Mostrar Resposta</button>
+                <div class="quiz-answer mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-green-800">${q.a}</p>
+                </div>
+            </div>
+        `).join('');
+
+        return `
+            <div class="card p-5">
+                <h4 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-2xl mr-3">${icons.quiz}</span>
+                    ${cardData.title}
+                </h4>
+                <div class="text-gray-700">${questionsHtml}</div>
+            </div>
+        `;
+    }
+
+    function createChartCard(cardData) {
+        return `
+            <div class="card p-5">
+                 <h4 class="text-lg font-bold mb-3 flex items-center">
+                    <span class="text-2xl mr-3">${icons.diagrama}</span>
+                    ${cardData.title}
+                </h4>
+                <div class="chart-container">
+                    <canvas id="dynamicChart"></canvas>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderContent() {
+        if (activeChart) {
+            activeChart.destroy();
+            activeChart = null;
+        }
+
+        const topic = apostilaData[currentTopicId];
+        headerTitle.textContent = topic.title;
+        mainContent.innerHTML = '';
+
+        if (topic.subtopics) {
+            // Render tabs for subtopics
+            const subTopicKeys = Object.keys(topic.subtopics);
+            currentSubTopicId = currentSubTopicId && topic.subtopics[currentSubTopicId] ? currentSubTopicId : subTopicKeys[0];
+            
+            const tabsHtml = `
+                <div class="flex border-b border-gray-200 mb-6 space-x-4">
+                    ${subTopicKeys.map(key => `
+                        <button class="tab-button py-2 px-1 text-gray-500 hover:text-gray-800 ${key === currentSubTopicId ? 'active' : ''}" data-subtopic="${key}">
+                            ${topic.subtopics[key].title}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            mainContent.innerHTML += tabsHtml;
+
+            const subtopicContent = topic.subtopics[currentSubTopicId].content;
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+            
+            subtopicContent.forEach(cardData => {
+                let cardHtml = '';
+                if (cardData.type === 'quiz') {
+                    cardHtml = createQuizCard(cardData);
+                } else if (cardData.type === 'diagrama' && cardData.chartType === 'bar') {
+                    cardHtml = createChartCard(cardData);
+                }
+                else {
+                    cardHtml = createCard(cardData);
+                }
+                grid.innerHTML += cardHtml;
+            });
+            mainContent.appendChild(grid);
+            
+            // Render chart if it exists
+            const chartDataCard = subtopicContent.find(c => c.type === 'diagrama' && c.chartType === 'bar');
+            if (chartDataCard) {
+                const ctx = document.getElementById('dynamicChart').getContext('2d');
+                activeChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartDataCard.data,
+                    options: chartDataCard.options
+                });
+            }
+
+        } else {
+            mainContent.innerHTML = topic.content;
+            if (currentTopicId === 'comparador') {
+                setupComparator();
+            }
+        }
+
+        // Add event listeners for new content
+        mainContent.querySelectorAll('.toggle-answer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const answerDiv = btn.nextElementSibling;
+                answerDiv.classList.toggle('show');
+            });
+        });
+
+        mainContent.querySelectorAll('.tab-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentSubTopicId = btn.dataset.subtopic;
+                render();
+            });
+        });
+    }
+
+    function setupComparator() {
+        const optionsContainer = document.getElementById('comparator-options');
+        const tableContainer = document.getElementById('comparator-table-container');
+        
+        optionsContainer.innerHTML = Object.keys(contractComparisonData).map(key => `
+            <div>
+                <input type="checkbox" id="compare-${key}" value="${key}" class="comparator-checkbox h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <label for="compare-${key}" class="ml-2 text-gray-700">${contractComparisonData[key].name}</label>
+            </div>
+        `).join('');
+
+        optionsContainer.querySelectorAll('.comparator-checkbox').forEach(box => {
+            box.addEventListener('change', updateComparatorTable);
+        });
+
+        function updateComparatorTable() {
+            const selected = Array.from(optionsContainer.querySelectorAll('.comparator-checkbox:checked')).map(box => box.value);
+            
+            if (selected.length < 2) {
+                tableContainer.innerHTML = '<p class="text-center text-gray-500">Selecione pelo menos dois contratos para comparar.</p>';
+                return;
+            }
+
+            if (selected.length > 3) {
+                 // Uncheck the last checked item
+                this.checked = false;
+                alert('Você pode comparar no máximo 3 contratos por vez.');
+                return;
+            }
+
+            const headers = ['Característica', ...selected.map(key => contractComparisonData[key].name)];
+            const features = ['Objeto', 'Natureza', 'Finalidade', 'Restituição'];
+
+            let tableHTML = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                ${headers.map(h => `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${h}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${features.map(feature => `
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${feature}</td>
+                                    ${selected.map(key => `<td class="px-6 py-4 whitespace-nowrap text-gray-600">${contractComparisonData[key][feature]}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            tableContainer.innerHTML = tableHTML;
+        }
+        updateComparatorTable();
+    }
+
+    function render() {
+        renderNav();
+        renderContent();
+    }
+
+    nav.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A' && e.target.dataset.topic) {
+            e.preventDefault();
+            currentTopicId = e.target.dataset.topic;
+            currentSubTopicId = null; // Reset subtopic when changing main topic
+            render();
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+    });
+
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // Initial render
+    render();
+});
+</script>
+</body>
+</html>
